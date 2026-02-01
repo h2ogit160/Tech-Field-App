@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tech Field App v12.4</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+</head>
+<body>
+<h2>Tech Field App v12.4 (PWA)</h2>
+<p>Deploy this folder to HTTPS hosting.</p>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./service-worker.js");
+}
+</script>
+</body>
+</html>
