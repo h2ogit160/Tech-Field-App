@@ -1,1 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Tech Field App – v12.4</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f172a;
+      --muted:#94a3b8;
+      --text:#e2e8f0;
+      --line:#1f2a44;
+      --btn:#2563eb;
+      --btn2:#0ea5e9;
+      --bad:#ef4444;
+      --ok:#22c55e;
+      --warn:#f59e0b;
+      --chip:#111c33;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 10% 0%, #0f1a33 0%, var(--bg) 60%);
+      color:var(--text);
+      padding:16px;
+    }
+    .wrap{max-width:920px;margin:0 auto}
+    .top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+    .brand{display:flex;flex-direction:column;gap:6px;}
+    .title{font-size:18px;font-weight:800;letter-spacing:.2px}
+    .sub{font-size:12px;color:var(--muted)}
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      background:linear-gradient(180deg,#0c1731,#0a1328);
+      border:1px solid var(--line);
+      padding:8px 10px;border-radius:12px;
+      font-size:12px;color:#cbd5e1;
+      user-select:none;
+    }
+    .dot{width:8px;height:8px;border-radius:999px;background:var(--btn2)}
+    .card{
+      background:linear-gradient(180deg,rgba(15,23,42,.92),rgba(15,23,42,.75));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.22);
+      margin-bottom:12px;
+    }
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .col{flex:1 1 260px;min-width:240px}
+    label{display:block;font-size:12px;color:#cbd5e1;margin:10px 0 6px}
+    input, select, textarea{
+      width:100%;
+      background:#0b1630;
+      color:var(--text);
+      border:1px solid #223153;
+      border-radius:12px;
+      padding:10px 10px;
+      outline:none;
+      font-size:14px;
+    }
+    input:focus, select:focus, textarea:focus{border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.18)}
+    textarea{min-height:90px;resize:vertical}
+    .req::after{content:" *";color:#60a5fa;font-weight:800}
+    .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    button{
+      appearance:none;border:0;
+      border-radius:14px;
+      padding:11px 14px;
+      font-weight:800;
+      cursor:pointer;
+      color:white;
+      background:var(--btn);
+      box-shadow:0 10px 24px rgba(37,99,235,.25);
+    }
+    button.secondary{background:#334155; box-shadow:none}
+    button.alt{background:var(--btn2); box-shadow:0 10px 24px rgba(14,165,233,.22)}
+    button.danger{background:var(--bad); box-shadow:0 10px 24px rgba(239,68,68,.16)}
+    button:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.8)}
+    .mini{font-size:12px;padding:8px 10px;border-radius:12px}
+    .help{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}
+    .grid{display:grid;grid-template-columns: 1fr 1fr;gap:12px;}
+    @media (max-width:720px){
+      body{padding:12px}
+      .grid{grid-template-columns:1fr}
+    }
+    .status{
+      display:flex;align-items:flex-start;gap:10px;
+      padding:10px 12px;border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(17,24,39,.55);
+      margin-top:10px;
+      font-size:13px;
+      line-height:1.35;
+    }
+    .status .pill{
+      padding:3px 8px;border-radius:999px;
+      font-size:11px;font-weight:900;
+      background:var(--chip);border:1px solid var(--line);
+      white-space:nowrap;
+    }
+    .pill.ok{border-color:rgba(34,197,94,.4); color:#86efac}
+    .pill.bad{border-color:rgba(239,68,68,.4); color:#fecaca}
+    .pill.warn{border-color:rgba(245,158,11,.45); color:#fde68a}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+    .hr{height:1px;background:var(--line);margin:10px 0}
+    .chip{
+      display:inline-flex;align-items:center;gap:6px;
+      background:rgba(15,23,42,.8);
+      border:1px solid var(--line);
+      padding:6px 10px;border-radius:999px;
+      font-size:12px;color:#cbd5e1;
+      margin-top:8px;
+      max-width:100%;
+    }
+    .chip code{font-size:11px}
+    .hidden{display:none !important}
+    .preview{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-top:10px;}
+    .thumbs{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;}
+    .thumb{
+      width:92px;height:92px;border-radius:14px;
+      border:1px solid var(--line);
+      background:#0b1630;
+      overflow:hidden;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .thumb img{width:100%;height:100%;object-fit:cover}
+    .kv{display:flex;flex-direction:column;gap:6px;flex:1 1 260px;min-width:220px;}
+    .kv .k{font-size:12px;color:var(--muted)}
+    .kv .v{font-size:13px;color:#e5e7eb}
+    .filelist{
+      max-height:130px; overflow:auto;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(11,22,48,.6);
+      padding:8px 10px;
+    }
+    .fileitem{
+      display:flex;justify-content:space-between;gap:10px;
+      font-size:12px;color:#e5e7eb;
+      padding:6px 0;
+      border-bottom:1px dashed rgba(31,42,68,.8);
+    }
+    .fileitem:last-child{border-bottom:0}
+    .disabled-block{
+      opacity:.55;
+      filter:saturate(.9);
+    }
+  </style>
+  <link rel="manifest" href="manifest.json" />
+</head>
 
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="title">Tech Field App</div>
+        <div class="sub">Offline single-file field submission form • Built for Android + Desktop</div>
+        <div class="chip"><span class="mono">RUNNING BUILD:</span> <code class="mono">v12.4 (FIELD-TECH)</code></div>
+      </div>
+      <div class="badge" title="This banner confirms you are running v12.4">
+        <span class="dot"></span>
+        <span class="mono">v12.4</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div class="col">
+          <label class="req">Submission Endpoint (editable)</label>
+          <input id="endpoint" type="text" inputmode="url" placeholder="https://xxxxx.m.pipedream.net" autocomplete="off" />
+          <div class="help">Paste your endpoint URL. If you paste without https://, we auto-add it.</div>
+        </div>
+        <div class="col">
+          <label>Email Target (reference)</label>
+          <input id="emailTarget" type="text" value="contact.walnc@gmail.com" readonly />
+          <div class="help">Displayed for reference. Email notification must be configured inside Pipedream (or your endpoint workflow).</div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <div class="col">
+          <label class="req">Technician Name</label>
+          <input id="techName" type="text" placeholder="Full name" />
+        </div>
+        <div class="col">
+          <label>Technician Phone</label>
+          <input id="techPhone" type="tel" placeholder="(optional)" />
+        </div>
+        <div class="col">
+          <label>Technician Email</label>
+          <input id="techEmail" type="email" placeholder="(optional)" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label class="req">Client / Homeowner Name</label>
+          <input id="clientName" type="text" placeholder="Client name" />
+        </div>
+        <div class="col">
+          <label class="req">Service Address</label>
+          <input id="address" type="text" placeholder="Street, City, State" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label class="req">Sample ID</label>
+          <input id="sampleId" type="text" placeholder="Auto-generated if blank" />
+          <div class="help">If blank, a Sample ID is generated on submit.</div>
+        </div>
+        <div class="col">
+          <label>Date & Time</label>
+          <input id="ts" type="datetime-local" />
+        </div>
+        <div class="col">
+          <label>Job / Ticket #</label>
+          <input id="jobId" type="text" placeholder="(optional)" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title" style="font-size:14px;">Phase-2 Fields</div>
+      <div class="sub">Conditional behavior applied per your rules.</div>
+
+      <div class="grid" id="dynamicFields"></div>
+
+      <label>Notes / Observations</label>
+      <textarea id="notes" placeholder="Any observations, issues, install notes, photos context, etc."></textarea>
+
+      <div class="help">
+        Rules:
+        <span class="mono">Treatment Installed = No</span> disables related equipment fields.
+        <span class="mono">Water Source = Well</span> enables Pressure/Flow and Well Tags.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title" style="font-size:14px;">Photos (multiple allowed)</div>
+      <div class="sub">Capture opens camera. Select opens gallery/files. You can add multiple photos.</div>
+
+      <div class="btns">
+        <button class="alt" id="btnCapture" type="button">Capture Photo(s)</button>
+        <button class="secondary" id="btnSelect" type="button">Select Existing Photo(s)</button>
+        <button class="secondary mini" id="btnRemovePhotos" type="button" disabled>Remove All Photos</button>
+      </div>
+
+      <input id="photoCapture" class="hidden" type="file" accept="image/*" capture="environment" multiple />
+      <input id="photoSelect" class="hidden" type="file" accept="image/*" multiple />
+
+      <div class="preview hidden" id="photoPreview">
+        <div class="thumbs" id="thumbs"></div>
+        <div class="kv">
+          <div class="k">Selected files</div>
+          <div class="filelist" id="photoList"></div>
+          <div class="k">Upload mode</div>
+          <div class="v" id="photoMode">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="align-items:center;justify-content:space-between;">
+        <div>
+          <div class="title" style="font-size:14px;">Submit</div>
+          <div class="sub">Sends a single POST to your endpoint with fields + optional photos.</div>
+        </div>
+        <div class="btns" style="margin:0;">
+          <button id="btnSubmit" type="button">Send Submission</button>
+          <button id="btnRetry" class="secondary" type="button" disabled>Retry</button>
+          <button id="btnClear" class="danger" type="button">Clear Saved Data</button>
+        </div>
+      </div>
+
+      <div id="statusBox" class="status hidden" role="status" aria-live="polite">
+        <div class="pill warn" id="statusPill">STATUS</div>
+        <div>
+          <div id="statusMsg">—</div>
+          <div class="help mono" id="statusDetail" style="margin-top:6px;">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub" style="text-align:center;margin:12px 0 8px;">
+      Local-only storage • No sign-in • Designed for quick field submission
+    </div>
+  </div>
+
+<script>
+(() => {
+  'use strict';
+
+  const APP_VERSION = 'v12.4';
+  const STORAGE_KEY = 'techFieldApp_' + APP_VERSION + '_state';
+
+  // ---- Field config (includes your requested additions + conditional targets) ----
+  const PHASE2_FIELDS = [
+    { id:'waterSource', label:'Water Source', type:'select', required:true, options:['Well','Municipal','Other'] },
+
+    // Collection Point dropdown: includes "Well-head faucet"
+    { id:'collectionPoint', label:'Collection Point', type:'select', required:true, options:['Kitchen','Outside Spigot','Pressure Tank','Well-head faucet','Other'] },
+
+    { id:'treatmentInstalled', label:'Treatment Installed?', type:'select', required:true, options:['Yes','No','Unknown'] },
+
+    // Related equipment fields (disabled when Treatment Installed = No)
+    { id:'equipmentType', label:'Equipment Type', type:'text', required:false, placeholder:'e.g., Softener / Carbon / RO / Combo', group:'treatmentRelated' },
+    { id:'serial', label:'Equipment Serial #', type:'text', required:false, placeholder:'(optional)', group:'treatmentRelated' },
+    { id:'bypass', label:'Bypass Position', type:'select', required:false, options:['In Service','Bypass','Unknown'], group:'treatmentRelated' },
+
+    // Pressure/Flow (only active if Water Source = Well)
+    { id:'pressure', label:'Pressure (psi)', type:'number', required:false, placeholder:'(optional)', group:'wellOnly' },
+    { id:'flow', label:'Flow (gpm)', type:'number', required:false, placeholder:'(optional)', group:'wellOnly' },
+
+    // NEW: Well Tags Present/Not Present (only if Well selected)
+    { id:'wellTags', label:'Well Tags', type:'select', required:false, options:['Present','Not Present'], group:'wellOnly' },
+  ];
+
+  const el = (id) => document.getElementById(id);
+
+  const endpoint = el('endpoint');
+  const techName = el('techName');
+  const techPhone = el('techPhone');
+  const techEmail = el('techEmail');
+  const clientName = el('clientName');
+  const address = el('address');
+  const sampleId = el('sampleId');
+  const ts = el('ts');
+  const jobId = el('jobId');
+  const notes = el('notes');
+
+  const dynamicFieldsWrap = el('dynamicFields');
+
+  const btnCapture = el('btnCapture');
+  const btnSelect = el('btnSelect');
+  const btnRemovePhotos = el('btnRemovePhotos');
+  const photoCapture = el('photoCapture');
+  const photoSelect = el('photoSelect');
+  const photoPreview = el('photoPreview');
+  const thumbs = el('thumbs');
+  const photoList = el('photoList');
+  const photoMode = el('photoMode');
+
+  const btnSubmit = el('btnSubmit');
+  const btnRetry = el('btnRetry');
+  const btnClear = el('btnClear');
+
+  const statusBox = el('statusBox');
+  const statusPill = el('statusPill');
+  const statusMsg = el('statusMsg');
+  const statusDetail = el('statusDetail');
+
+  let selectedPhotoFiles = [];
+  let selectedModes = [];
+  let lastPayload = null;
+
+  const safeTrim = (v) => (v == null ? '' : String(v)).trim();
+
+  const nowLocalInputValue = () => {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const genSampleId = () => {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2,'0');
+    const stamp = `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+    const rand = Math.random().toString(36).slice(2,6).toUpperCase();
+    return `SAMPLE-${stamp}-${rand}`;
+  };
+
+  const escapeHtml = (s) => String(s || '')
+    .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+    .replaceAll('"','&quot;').replaceAll("'","&#039;");
+
+  // Endpoint normalize/validate
+  const normalizeEndpoint = (raw) => {
+    let v = safeTrim(raw);
+    if(!v) return '';
+    v = v.replace(/^["']+|["']+$/g, '');
+    if(!/^https?:\/\//i.test(v)){
+      v = 'https://' + v;
+    }
+    return v;
+  };
+  const isValidHttpUrl = (v) => {
+    try{
+      const u = new URL(v);
+      return (u.protocol === 'http:' || u.protocol === 'https:') && !!u.hostname;
+    }catch(e){ return false; }
+  };
+
+  const showStatus = (kind, msg, detail) => {
+    statusBox.classList.remove('hidden');
+    statusPill.classList.remove('ok','bad','warn');
+    statusPill.classList.add(kind);
+    statusPill.textContent = kind === 'ok' ? 'SENT' : (kind === 'bad' ? 'FAILED' : 'STATUS');
+    statusMsg.textContent = msg || '—';
+    statusDetail.textContent = detail || '—';
+    if(kind === 'bad') btnRetry.disabled = false;
+    if(kind === 'ok') btnRetry.disabled = true;
+  };
+  const hideStatus = () => statusBox.classList.add('hidden');
+
+  const setSending = (sending) => {
+    btnSubmit.disabled = sending;
+    btnRetry.disabled = sending || !lastPayload;
+    btnCapture.disabled = sending;
+    btnSelect.disabled = sending;
+    btnRemovePhotos.disabled = sending || selectedPhotoFiles.length === 0;
+    endpoint.disabled = sending;
+  };
+
+  const fieldId = (cfg) => `f_${cfg.id}`;
+
+  // Track which fields are disabled due to rules (we also clear their values)
+  const setFieldEnabled = (cfg, enabled) => {
+    const input = el(fieldId(cfg));
+    if(!input) return;
+
+    input.disabled = !enabled;
+    if(!enabled){
+      if(input.tagName === 'SELECT'){
+        // reset to first option
+        input.selectedIndex = 0;
+      } else {
+        input.value = '';
+      }
+      input.dataset.disabledByRule = '1';
+      input.closest('.col')?.classList.add('disabled-block');
+    } else {
+      delete input.dataset.disabledByRule;
+      input.closest('.col')?.classList.remove('disabled-block');
+    }
+  };
+
+  const applyRules = () => {
+    const waterSourceVal = safeTrim(el(fieldId({id:'waterSource'}))?.value);
+    const treatmentVal = safeTrim(el(fieldId({id:'treatmentInstalled'}))?.value);
+
+    // 1) Treatment Installed = No disables treatmentRelated group
+    const treatmentEnabled = (treatmentVal !== 'No');
+    PHASE2_FIELDS.filter(f => f.group === 'treatmentRelated')
+      .forEach(cfg => setFieldEnabled(cfg, treatmentEnabled));
+
+    // 2) Water Source = Well enables wellOnly group
+    const wellEnabled = (waterSourceVal === 'Well');
+    PHASE2_FIELDS.filter(f => f.group === 'wellOnly')
+      .forEach(cfg => setFieldEnabled(cfg, wellEnabled));
+
+    saveState();
+  };
+
+  const renderPhase2Fields = () => {
+    dynamicFieldsWrap.innerHTML = '';
+    PHASE2_FIELDS.forEach(cfg => {
+      const wrap = document.createElement('div');
+      wrap.className = 'col';
+
+      const label = document.createElement('label');
+      label.textContent = cfg.label;
+      if(cfg.required) label.classList.add('req');
+
+      let input;
+      if(cfg.type === 'select'){
+        input = document.createElement('select');
+        (cfg.options || []).forEach(opt => {
+          const o = document.createElement('option');
+          o.value = opt; o.textContent = opt;
+          input.appendChild(o);
+        });
+      }else{
+        input = document.createElement('input');
+        input.type = cfg.type || 'text';
+        input.placeholder = cfg.placeholder || '';
+        if(cfg.type === 'number') input.inputMode = 'decimal';
+      }
+
+      input.id = fieldId(cfg);
+      input.addEventListener('input', () => {
+        saveState();
+        if(cfg.id === 'treatmentInstalled' || cfg.id === 'waterSource'){
+          applyRules();
+        }
+      });
+
+      wrap.appendChild(label);
+      wrap.appendChild(input);
+      dynamicFieldsWrap.appendChild(wrap);
+    });
+  };
+
+  const getPhase2Values = () => {
+    const out = {};
+    PHASE2_FIELDS.forEach(cfg => {
+      const input = el(fieldId(cfg));
+      // If disabled by rule, force blank (prevents stale values)
+      if(input && input.disabled){
+        out[cfg.id] = '';
+      } else {
+        out[cfg.id] = safeTrim(input?.value);
+      }
+    });
+    return out;
+  };
+
+  const validateRequired = () => {
+    const errs = [];
+
+    const epNorm = normalizeEndpoint(endpoint.value);
+    if(!epNorm) errs.push('Endpoint URL is required.');
+    else if(!isValidHttpUrl(epNorm)) errs.push('Endpoint URL is not valid. (Paste full URL or domain; https:// is auto-added.)');
+
+    if(!safeTrim(techName.value)) errs.push('Technician Name is required.');
+    if(!safeTrim(clientName.value)) errs.push('Client / Homeowner Name is required.');
+    if(!safeTrim(address.value)) errs.push('Service Address is required.');
+
+    PHASE2_FIELDS.forEach(cfg => {
+      if(cfg.required){
+        const input = el(fieldId(cfg));
+        if(input && input.disabled) return; // if a required field ever becomes disabled (not currently), skip
+        const v = safeTrim(input?.value);
+        if(!v) errs.push(cfg.label + ' is required.');
+      }
+    });
+
+    return errs;
+  };
+
+  const saveState = () => {
+    const state = {
+      version: APP_VERSION,
+      endpoint: endpoint.value,
+      techName: techName.value,
+      techPhone: techPhone.value,
+      techEmail: techEmail.value,
+      clientName: clientName.value,
+      address: address.value,
+      sampleId: sampleId.value,
+      ts: ts.value,
+      jobId: jobId.value,
+      notes: notes.value,
+      phase2: getPhase2Values(),
+      photoMeta: selectedPhotoFiles.length ? selectedPhotoFiles.map((f, i) => ({
+        name: f.name,
+        size: f.size,
+        type: f.type,
+        how: selectedModes[i] || '—'
+      })) : null
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  };
+
+  const loadState = () => {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return;
+    try{
+      const state = JSON.parse(raw);
+      if(state.version !== APP_VERSION) return;
+
+      endpoint.value = state.endpoint || '';
+      techName.value = state.techName || '';
+      techPhone.value = state.techPhone || '';
+      techEmail.value = state.techEmail || '';
+      clientName.value = state.clientName || '';
+      address.value = state.address || '';
+      sampleId.value = state.sampleId || '';
+      ts.value = state.ts || '';
+      jobId.value = state.jobId || '';
+      notes.value = state.notes || '';
+
+      if(state.phase2){
+        PHASE2_FIELDS.forEach(cfg => {
+          const v = state.phase2[cfg.id] ?? '';
+          const input = el(fieldId(cfg));
+          if(input) input.value = v;
+        });
+      }
+
+      // Photo files can't be restored
+      if(state.photoMeta && state.photoMeta.length){
+        photoPreview.classList.remove('hidden');
+        thumbs.innerHTML = '<div class="sub" style="padding:8px;">Photos will need re-select</div>';
+        photoList.innerHTML = state.photoMeta.map(m =>
+          `<div class="fileitem"><span>${escapeHtml(m.name)}</span><span class="mono">${Math.round(m.size/1024)} KB</span></div>`
+        ).join('');
+        photoMode.textContent = 'Previously selected (re-select required)';
+      }
+    }catch(e){
+      // ignore
+    }
+  };
+
+  const clearState = () => localStorage.removeItem(STORAGE_KEY);
+
+  const refreshPhotoUI = () => {
+    const count = selectedPhotoFiles.length;
+    if(!count){
+      photoPreview.classList.add('hidden');
+      thumbs.innerHTML = '';
+      photoList.innerHTML = '';
+      photoMode.textContent = '—';
+      btnRemovePhotos.disabled = true;
+      saveState();
+      return;
+    }
+
+    btnRemovePhotos.disabled = false;
+    photoPreview.classList.remove('hidden');
+
+    thumbs.innerHTML = '';
+    const maxThumbs = Math.min(4, count);
+    for(let i=0;i<maxThumbs;i++){
+      const f = selectedPhotoFiles[i];
+      const url = URL.createObjectURL(f);
+      const t = document.createElement('div');
+      t.className = 'thumb';
+      const img = document.createElement('img');
+      img.src = url;
+      img.onload = () => URL.revokeObjectURL(url);
+      t.appendChild(img);
+      thumbs.appendChild(t);
+    }
+    if(count > 4){
+      const more = document.createElement('div');
+      more.className = 'sub';
+      more.style.paddingTop = '6px';
+      more.textContent = `+${count - 4} more`;
+      thumbs.appendChild(more);
+    }
+
+    photoList.innerHTML = selectedPhotoFiles.map((f, i) => {
+      const how = selectedModes[i] === 'capture' ? 'camera' : 'files';
+      return `<div class="fileitem"><span>${escapeHtml(f.name)} <span class="mono" style="opacity:.75">(${how})</span></span><span class="mono">${Math.round(f.size/1024)} KB</span></div>`;
+    }).join('');
+
+    const modes = new Set(selectedModes);
+    photoMode.textContent = modes.size === 1
+      ? ((selectedModes[0] === 'capture') ? 'Captured (camera)' : 'Selected (gallery/files)')
+      : 'Mixed (camera + files)';
+
+    saveState();
+  };
+
+  const addPhotos = (files, how) => {
+    const list = Array.from(files || []);
+    if(!list.length) return;
+    list.forEach(f => {
+      if(f && /^image\//i.test(f.type || '')){
+        selectedPhotoFiles.push(f);
+        selectedModes.push(how);
+      }
+    });
+    refreshPhotoUI();
+  };
+
+  const clearPhotos = () => {
+    selectedPhotoFiles = [];
+    selectedModes = [];
+    refreshPhotoUI();
+  };
+
+  const buildPayload = () => {
+    const phase2 = getPhase2Values();
+    const epNorm = normalizeEndpoint(endpoint.value);
+    if(epNorm && endpoint.value !== epNorm) endpoint.value = epNorm;
+
+    const payload = {
+      app_version: APP_VERSION,
+      device_timestamp: new Date().toISOString(),
+      endpoint: epNorm,
+      technician: {
+        name: safeTrim(techName.value),
+        phone: safeTrim(techPhone.value),
+        email: safeTrim(techEmail.value)
+      },
+      client: {
+        name: safeTrim(clientName.value),
+        address: safeTrim(address.value)
+      },
+      sample: {
+        id: safeTrim(sampleId.value) || genSampleId(),
+        local_datetime: safeTrim(ts.value) || '',
+        job_id: safeTrim(jobId.value)
+      },
+      phase2,
+      notes: safeTrim(notes.value),
+      photos: { count: selectedPhotoFiles.length }
+    };
+
+    if(!safeTrim(sampleId.value)) sampleId.value = payload.sample.id;
+
+    return payload;
+  };
+
+  const send = async (payload) => {
+    const ep = payload.endpoint;
+    const form = new FormData();
+    form.append('payload', JSON.stringify(payload));
+    selectedPhotoFiles.forEach((file, idx) => {
+      form.append('photos[]', file, file.name || `photo_${idx+1}.jpg`);
+    });
+
+    const res = await fetch(ep, { method: 'POST', body: form });
+    const text = await res.text().catch(() => '');
+    return { ok: res.ok, status: res.status, text };
+  };
+
+  const doSubmit = async () => {
+    hideStatus();
+
+    const errs = validateRequired();
+    if(errs.length){
+      showStatus('bad', 'Missing / invalid required items.', errs.join(' '));
+      return;
+    }
+
+    const payload = buildPayload();
+    lastPayload = payload;
+
+    setSending(true);
+    showStatus('warn', 'Sending…', 'Posting to endpoint. Please keep this tab open.');
+
+    try{
+      const result = await send(payload);
+      if(result.ok){
+        showStatus('ok', 'Submission sent successfully.', `HTTP ${result.status}`);
+        clearPhotos();
+        saveState();
+      } else {
+        showStatus('bad', 'Send failed.', `HTTP ${result.status} • ${result.text ? result.text.slice(0,200) : 'No response body'}`);
+      }
+    } catch(err){
+      showStatus('bad', 'Send failed (network / fetch error).', String(err && err.message ? err.message : err));
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const doRetry = async () => {
+    if(!lastPayload){
+      showStatus('bad', 'Nothing to retry.', 'Submit once to create a retry payload.');
+      return;
+    }
+    setSending(true);
+    showStatus('warn', 'Retrying…', 'Reposting last payload.');
+    try{
+      const result = await send(lastPayload);
+      if(result.ok){
+        showStatus('ok', 'Submission sent successfully.', `HTTP ${result.status}`);
+        clearPhotos();
+        saveState();
+      } else {
+        showStatus('bad', 'Retry failed.', `HTTP ${result.status} • ${result.text ? result.text.slice(0,200) : 'No response body'}`);
+      }
+    } catch(err){
+      showStatus('bad', 'Retry failed (network / fetch error).', String(err && err.message ? err.message : err));
+    } finally {
+      setSending(false);
+    }
+  };
+
+  // INIT
+  renderPhase2Fields();
+  ts.value = nowLocalInputValue();
+  loadState();
+
+  // Apply rules once on load
+  applyRules();
+
+  // Autosave base inputs
+  ['endpoint','techName','techPhone','techEmail','clientName','address','sampleId','ts','jobId','notes']
+    .forEach(id => el(id).addEventListener('input', saveState));
+
+  // Photo controls
+  btnCapture.addEventListener('click', () => photoCapture.click());
+  btnSelect.addEventListener('click', () => photoSelect.click());
+  photoCapture.addEventListener('change', (e) => { addPhotos(e.target.files, 'capture'); photoCapture.value=''; });
+  photoSelect.addEventListener('change', (e) => { addPhotos(e.target.files, 'select'); photoSelect.value=''; });
+  btnRemovePhotos.addEventListener('click', clearPhotos);
+
+  // Submit actions
+  btnSubmit.addEventListener('click', doSubmit);
+  btnRetry.addEventListener('click', doRetry);
+
+  // Clear
+  btnClear.addEventListener('click', () => {
+    if(confirm('Clear all saved data for v12.4 on this device?')){
+      clearState();
+      location.reload();
+    }
+  });
+
+})();
+</script>
+
+<script>
+/* v12.4 PWA: register service worker for mobile-safe HTTPS origin + offline shell */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+  });
+}
+</script>
+
+</body>
+</html>
