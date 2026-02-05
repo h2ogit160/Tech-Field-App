@@ -172,7 +172,7 @@
       <div class="row">
         <div class="col">
           <label class="req">Submission Endpoint (editable)</label>
-          <input id="endpoint" type="text" inputmode="url" placeholder="https://eoykflj3rmdswv5.m.pipedream.net" autocomplete="off" />
+          <input id="endpoint" type="text" inputmode="url" placeholder="https://xxxxx.m.pipedream.net" autocomplete="off" />
           <div class="help">Paste your endpoint URL. If you paste without https://, we auto-add it.</div>
         </div>
         <div class="col">
@@ -701,18 +701,47 @@
     return payload;
   };
 
-  const send = async (payload) => {
-    const ep = payload.endpoint;
-    const form = new FormData();
-    form.append('payload', JSON.stringify(payload));
-    selectedPhotoFiles.forEach((file, idx) => {
-      form.append('photos[]', file, file.name || `photo_${idx+1}.jpg`);
-    });
+  const fileToBase64 = (file) => new Promise((resolve, reject) => {
+  try{
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || '');
+      const comma = result.indexOf(',');
+      const base64 = comma >= 0 ? result.slice(comma+1) : result;
+      resolve(base64);
+    };
+    reader.onerror = () => reject(reader.error || new Error('File read failed'));
+    reader.readAsDataURL(file);
+  }catch(err){ reject(err); }
+});
 
-    const res = await fetch(ep, { method: 'POST', body: form });
-    const text = await res.text().catch(() => '');
-    return { ok: res.ok, status: res.status, text };
-  };
+const send = async (payload) => {
+  const ep = payload.endpoint;
+
+  // Embed photos as base64 in the JSON payload so the workflow can email attachments reliably.
+  // (Pipedream's HTTP trigger may not surface multipart files to downstream steps.)
+  const photoItems = await Promise.all(selectedPhotoFiles.map(async (file, idx) => ({
+    name: file.name || `photo_${idx+1}.jpg`,
+    type: file.type || 'image/jpeg',
+    base64: await fileToBase64(file),
+  })));
+
+  payload.photos = payload.photos || {};
+  payload.photos.count = photoItems.length;
+  payload.photos.items = photoItems;
+
+  const form = new FormData();
+  form.append('payload', JSON.stringify(payload));
+  // Keep multipart upload too (safe), but email attachments will use base64 payload above.
+  selectedPhotoFiles.forEach((file, idx) => {
+    form.append('photos[]', file, file.name || `photo_${idx+1}.jpg`);
+  });
+
+  const res = await fetch(ep, { method: 'POST', body: form });
+  const text = await res.text().catch(() => '');
+  return { ok: res.ok, status: res.status, text };
+};
+
 
   const doSubmit = async () => {
     hideStatus();
